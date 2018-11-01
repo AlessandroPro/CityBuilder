@@ -10,6 +10,8 @@
 		E8BD4575218B54B400C0375C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E8BD4574218B54B400C0375C /* main.cpp */; };
 		E8BD457D218B54ED00C0375C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8BD457C218B54ED00C0375C /* OpenGL.framework */; };
 		E8BD457F218B550A00C0375C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8BD457E218B550A00C0375C /* GLUT.framework */; };
+		E8BD458A218B5D5900C0375C /* Vector3D.c in Sources */ = {isa = PBXBuildFile; fileRef = E8BD4586218B5D5900C0375C /* Vector3D.c */; };
+		E8BD458B218B5D5900C0375C /* QuadMesh.c in Sources */ = {isa = PBXBuildFile; fileRef = E8BD4588218B5D5900C0375C /* QuadMesh.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,6 +31,10 @@
 		E8BD4574218B54B400C0375C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E8BD457C218B54ED00C0375C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		E8BD457E218B550A00C0375C /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		E8BD4586218B5D5900C0375C /* Vector3D.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Vector3D.c; sourceTree = "<group>"; };
+		E8BD4587218B5D5900C0375C /* QuadMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuadMesh.h; sourceTree = "<group>"; };
+		E8BD4588218B5D5900C0375C /* QuadMesh.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = QuadMesh.c; sourceTree = "<group>"; };
+		E8BD4589218B5D5900C0375C /* Vector3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector3D.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +71,10 @@
 			isa = PBXGroup;
 			children = (
 				E8BD4574218B54B400C0375C /* main.cpp */,
+				E8BD4588218B5D5900C0375C /* QuadMesh.c */,
+				E8BD4587218B5D5900C0375C /* QuadMesh.h */,
+				E8BD4586218B5D5900C0375C /* Vector3D.c */,
+				E8BD4589218B5D5900C0375C /* Vector3D.h */,
 			);
 			path = CityBuilder;
 			sourceTree = "<group>";
@@ -134,7 +144,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E8BD458B218B5D5900C0375C /* QuadMesh.c in Sources */,
 				E8BD4575218B54B400C0375C /* main.cpp in Sources */,
+				E8BD458A218B5D5900C0375C /* Vector3D.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
