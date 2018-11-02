@@ -19,10 +19,17 @@
 #else
 #include <GL/glut.h>
 #endif
-#include "Vector3D.h"
-#include "QuadMesh.h"
+#include "Vector3D.hpp"
+#include "Polygon.hpp"
+#include "PrismMesh.hpp"
 #include <iostream>
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+// Material properties
+static GLfloat mat_ambient[] = { 0.3F, 0.2F, 0.05F, 1.0F };
+static GLfloat mat_specular[] = { 0.4F, 0.2F, 0.4F, 1.0F };
+static GLfloat mat_diffuse[] = { 0.6F, 0.9F, 0.9F, 0.0F };
+static GLfloat mat_shininess[] = { 0.8F };
 
 const int meshSize = 36;    // Default Mesh Size
 const int vWidth = 850;     // Viewport width in pixels
@@ -35,7 +42,8 @@ static GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_ambient[] = { 0.2F, 0.2F, 0.2F, 1.0F };
 
 // A quad mesh representing the ground
-static QuadMesh groundMesh;
+//static QuadMesh groundMesh;
+PrismMesh triangle = *(new PrismMesh());
 
 // Prototypes for functions in this module
 void initOpenGL(int w, int h);
@@ -45,7 +53,7 @@ void keyboard(unsigned char key, int x, int y);
 void keyboardUp(unsigned char key, int x, int y);
 void functionKeys(int key, int x, int y);
 void functionKeysUp(int key, int x, int y);
-Vector3D ScreenToWorld(int x, int y);
+Vector3D* ScreenToWorld(int x, int y);
 void printControls();
 
 int main(int argc, char **argv)
@@ -97,17 +105,17 @@ void initOpenGL(int w, int h)
     glEnable(GL_NORMALIZE);    // Renormalize normal vectors
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);   // Nicer perspective
     
-    // Set up ground quad mesh
-    Vector3D origin = NewVector3D(-18.0f, 0.0f, 18.0f);
-    Vector3D dir1v = NewVector3D(1.0f, 0.0f, 0.0f);
-    Vector3D dir2v = NewVector3D(0.0f, 0.0f, -1.0f);
-    groundMesh = NewQuadMesh(meshSize);
-    InitMeshQM(&groundMesh, meshSize, origin, 36.0, 36.0, dir1v, dir2v);
-    
-    Vector3D ambient = NewVector3D(0.0f, 0.05f, 0.0f);
-    Vector3D diffuse = NewVector3D(0.4f, 0.8f, 0.4f);
-    Vector3D specular = NewVector3D(0.04f, 0.04f, 0.04f);
-    SetMaterialQM(&groundMesh, ambient, diffuse, specular, 0.2);
+//    // Set up ground quad mesh
+//    Vector3D origin = NewVector3D(-18.0f, 0.0f, 18.0f);
+//    Vector3D dir1v = NewVector3D(1.0f, 0.0f, 0.0f);
+//    Vector3D dir2v = NewVector3D(0.0f, 0.0f, -1.0f);
+//    groundMesh = NewQuadMesh(meshSize);
+//    InitMeshQM(&groundMesh, meshSize, origin, 36.0, 36.0, dir1v, dir2v);
+//
+//    Vector3D ambient = NewVector3D(0.0f, 0.05f, 0.0f);
+//    Vector3D diffuse = NewVector3D(0.4f, 0.8f, 0.4f);
+//    Vector3D specular = NewVector3D(0.04f, 0.04f, 0.04f);
+//    SetMaterialQM(&groundMesh, ambient, diffuse, specular, 0.2);
     
 }
 
@@ -118,10 +126,19 @@ void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    // Set material properties
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    
     // Draw Ground Mesh
     glPushMatrix();
-    glTranslatef(0.0,-5.0,0.0);
-    DrawMeshQM(&groundMesh, meshSize);
+    //DrawMeshQM(&groundMesh, meshSize);
+    glPopMatrix();
+    glPushMatrix();
+    //glRotatef(45, 0.0, 0.0, 1.0);
+        triangle.draw();
     glPopMatrix();
     
     glutSwapBuffers();   // Double buffering, swap buffers
@@ -179,12 +196,16 @@ void keyboardUp(unsigned char key, int x, int y)
 void functionKeys(int key, int x, int y)
 {
     if (key == GLUT_KEY_DOWN){
+        triangle.rotation.x = triangle.rotation.x + 5;
     }
     else if (key == GLUT_KEY_UP){
+        triangle.rotation.x = triangle.rotation.x - 5;
     }
     else if (key == GLUT_KEY_LEFT){
+        triangle.rotation.y = triangle.rotation.y + 5;
     }
     else if (key == GLUT_KEY_RIGHT){
+        triangle.rotation.y = triangle.rotation.y - 5;
     }
     glutPostRedisplay();   // Trigger a window redisplay
 }
@@ -204,10 +225,10 @@ void functionKeysUp(int key, int x, int y)
 }
 
 
-Vector3D ScreenToWorld(int x, int y)
+Vector3D* ScreenToWorld(int x, int y)
 {
     // you will need to finish this if you use the mouse
-    return NewVector3D(0, 0, 0);
+    return new Vector3D(0.0, 0.0, 0.0);
 }
 
 // Prints the controls to the standard output
