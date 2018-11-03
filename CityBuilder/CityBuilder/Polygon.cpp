@@ -15,14 +15,17 @@ Polygon::Polygon():
 
 void Polygon::calculateNormal()
 {
-    if(verts.size() >= 3) {
+    if(verts.size() >= 3)
+    {
+        Vector3D v1 = Vector3D::subtract(verts[0], verts[1]);
+        Vector3D v2 = Vector3D::subtract(verts[0], verts[2]);
         if(isFrontFacing)
         {
-            normal = *Vector3D::crossProduct(verts[0], verts[1]);
+            normal = Vector3D::crossProduct(v1, v2);
         }
         else
         {
-            normal = *Vector3D::crossProduct(verts[1], verts[0]);
+            normal = Vector3D::crossProduct(v2, v1);
         }
         normal.normalize();
     }
@@ -30,7 +33,7 @@ void Polygon::calculateNormal()
 
 void Polygon::draw()
 {
-    glBegin(GL_POLYGON);
+    glBegin(GL_LINE_LOOP);
     glNormal3f(normal.x, normal.y, normal.z);
     for(int i = 0; i < verts.size(); i++){
         //std::cout << i << "\n";

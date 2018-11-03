@@ -25,12 +25,12 @@ class Vector3D
         void normalize();
         float getLength();
     
-        static Vector3D* crossProduct(const Vector3D& lhs, const Vector3D& rhs);
+        static Vector3D crossProduct(const Vector3D& lhs, const Vector3D& rhs);
         static float DotProduct(const Vector3D& lhs, const Vector3D& rhs);
-        static Vector3D* add(const Vector3D& v1, const Vector3D& v2);
-        static Vector3D* subtract(const Vector3D& v1, const Vector3D& v2);
-        static Vector3D* scalarMul(const Vector3D& v, const float rhs);
-        static Vector3D* negate(const Vector3D& v);
+        static Vector3D add(const Vector3D& v1, const Vector3D& v2);
+        static Vector3D subtract(const Vector3D& v1, const Vector3D& v2);
+        static Vector3D scalarMul(const Vector3D& v, const float rhs);
+        static Vector3D negate(const Vector3D& v);
 };
 
 #endif /* Vector3D_h */

@@ -15,17 +15,28 @@
 
 class PrismMesh
 {
-public:
     int numBaseEdges;
-    const float height;
+    float rotationY;
+    const float initialHeight;
+    float currentHeight;
+    Vector3D scaleFactors;
+    Vector3D position;
+    const float minScaleFactor = 0.2;
+    
+public:
+    
     Polygon baseBottom;
     Polygon baseTop;
-    Vector3D rotation;
     std::vector<Polygon> quads;
     
     PrismMesh();
     void draw();
     void build();
+    void buildwithFloors();
+    void changeNumSides(int changeNum);
+    void rotateY(float deltaY);
+    void moveAlongGround(float deltaX, float deltaY);
+    void changeScaleFactors(Vector3D scaleDeltas);
 };
 
 #endif /* PrismMesh_hpp */

@@ -9,20 +9,25 @@
 #include "PrismMesh.hpp"
 
 PrismMesh::PrismMesh():
-    numBaseEdges(8),
-    rotation(Vector3D(0.0,0.0,0.0)),
-    height(7.0)
+    numBaseEdges(4),
+    rotationY(0.0),
+    initialHeight(7.0),
+    currentHeight(initialHeight),
+    scaleFactors(Vector3D(1.0, 1.0, 1.0)),
+    position(Vector3D(0.0, initialHeight/2, 0.0))
     {
-        build();
+        buildwithFloors();
     }
 
 void PrismMesh::draw()
 {
     glPushMatrix();
-    glRotatef(rotation.y, 0.0, 1.0, 0.0);
-    glRotatef(rotation.x, 1.0, 0.0, 0.0);
-    baseBottom.draw();
-    baseTop.draw();
+    glTranslatef(position.x, 0.0, position.z);
+    glRotatef(rotationY, 0.0, 1.0, 0.0);
+    glScalef(scaleFactors.x, scaleFactors.y, scaleFactors.z);
+    glTranslatef(0.0, position.y, 0.0);
+    //baseBottom.draw();
+    //baseTop.draw();
     for (auto& quad : quads)
     {
         quad.draw();
@@ -32,13 +37,16 @@ void PrismMesh::draw()
 
 void PrismMesh::build()
 {
+    baseBottom.verts.clear();
+    baseTop.verts.clear();
+    quads.clear();
     for(int i = 0; i < numBaseEdges; i++)
     {
         float angle = (360.0/numBaseEdges)*i;
-        float x = sin(angle * PI / 180.0)*(height/2);
-        float z = cos(angle * PI / 180.0)*(height/2);
-        baseBottom.verts.push_back(Vector3D(x, -(height/2), z));
-        baseTop.verts.push_back(Vector3D(x, (height/2), z));
+        float x = sin(angle * PI / 180.0)*(initialHeight/2);
+        float z = cos(angle * PI / 180.0)*(initialHeight/2);
+        baseBottom.verts.push_back(Vector3D(x, -(initialHeight/2), z));
+        baseTop.verts.push_back(Vector3D(x, (initialHeight/2), z));
     }
     
     for(int i = 0; i < numBaseEdges; i++)
@@ -61,8 +69,108 @@ void PrismMesh::build()
     baseBottom.isFrontFacing = false;
     baseBottom.calculateNormal();
     baseTop.calculateNormal();
-    
-    std::cout << baseBottom.normal.y << "\n";
-    std::cout << baseTop.normal.y << "\n";
 }
+
+
+void PrismMesh::buildwithFloors()
+{
+    float floorHeight = 1.0;
+    int numFloors = ceil(initialHeight/floorHeight);
+    std::vector<std::vector<Vector3D>> floors = {};
+    
+    //Creates vertices for the building
+    //redo with vector3D pointers
+    std::vector<Vector3D> floor1Verts = {};
+    for(int i = 0; i < numBaseEdges; i++)
+    {
+        float angle = (360.0/numBaseEdges)*i;
+        float x = sin(angle * PI / 180.0)*(initialHeight/2);
+        float z = cos(angle * PI / 180.0)*(initialHeight/2);
+        floor1Verts.push_back(Vector3D(x, -(initialHeight/2), z));
+    }
+    floors.push_back(floor1Verts);
+    
+    //redo with vector3D pointers
+    for(int i = 1; i <= numFloors; i++)
+    {
+        std::vector<Vector3D> nextFloorVerts = floor1Verts;
+        for(int j = 0; j < numBaseEdges; j++)
+        {
+            nextFloorVerts.at(j).y = -(initialHeight/2) + (floorHeight*i);
+        }
+        floors.push_back(nextFloorVerts);
+    }
+    
+    //Creates quads for the building
+    quads.clear();
+    for(int i = 0; i < numFloors; i++)
+    {
+        for(int j = 0; j < numBaseEdges; j++)
+        {
+            Polygon newQuad = Polygon();
+            newQuad.verts.push_back(floors.at(i).at(j));
+            newQuad.verts.push_back(floors.at(i + 1).at(j));
+            if(j == 0)
+            {
+                newQuad.verts.push_back(floors.at(i + 1).at(numBaseEdges-1));
+                newQuad.verts.push_back(floors.at(i).at(numBaseEdges-1));
+            }
+            else{
+                newQuad.verts.push_back(floors.at(i + 1).at(j-1));
+                newQuad.verts.push_back(floors.at(i).at(j-1));
+            }
+            newQuad.calculateNormal();
+            quads.push_back(newQuad);
+        }
+    }
+}
+
+
+void PrismMesh::changeNumSides(int changeNum)
+{
+    numBaseEdges += changeNum;
+    if (numBaseEdges < 3)
+    {
+        numBaseEdges = 3;
+    }
+    buildwithFloors();
+}
+
+void PrismMesh::rotateY(float deltaY)
+{
+    rotationY += deltaY;
+}
+
+void PrismMesh::moveAlongGround(float deltaX, float deltaZ)
+{
+    position.x += deltaX;
+    position.z += deltaZ;
+}
+
+void PrismMesh::changeScaleFactors(Vector3D scaleDeltas)
+{
+    scaleFactors.x += scaleDeltas.x;
+    scaleFactors.y += scaleDeltas.y;
+    scaleFactors.z += scaleDeltas.z;
+    
+    if(scaleFactors.x < minScaleFactor)
+    {
+        scaleFactors.x = minScaleFactor;
+    }
+    
+    if(scaleFactors.y < minScaleFactor)
+    {
+        scaleFactors.y = minScaleFactor;
+    }
+    
+    if(scaleFactors.z < minScaleFactor)
+    {
+        scaleFactors.z = minScaleFactor;
+    }
+    
+    currentHeight *= scaleFactors.y;
+}
+
+
+
 

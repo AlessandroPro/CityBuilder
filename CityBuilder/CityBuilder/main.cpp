@@ -31,7 +31,8 @@ static GLfloat mat_specular[] = { 0.4F, 0.2F, 0.4F, 1.0F };
 static GLfloat mat_diffuse[] = { 0.6F, 0.9F, 0.9F, 0.0F };
 static GLfloat mat_shininess[] = { 0.8F };
 
-const int meshSize = 36;    // Default Mesh Size
+const int groundLength = 36;    // Default ground length
+const int groundWidth = 36;    // Default ground height
 const int vWidth = 850;     // Viewport width in pixels
 const int vHeight = 500;    // Viewport height in pixels
 
@@ -41,9 +42,7 @@ static GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_ambient[] = { 0.2F, 0.2F, 0.2F, 1.0F };
 
-// A quad mesh representing the ground
-//static QuadMesh groundMesh;
-PrismMesh triangle = *(new PrismMesh());
+PrismMesh prism;
 
 // Prototypes for functions in this module
 void initOpenGL(int w, int h);
@@ -55,6 +54,7 @@ void functionKeys(int key, int x, int y);
 void functionKeysUp(int key, int x, int y);
 Vector3D* ScreenToWorld(int x, int y);
 void printControls();
+
 
 int main(int argc, char **argv)
 {
@@ -126,19 +126,23 @@ void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    //Draw ground quad
+    glBegin(GL_QUADS);
+    glNormal3f(0.0, 1.0, 0.0);
+    glVertex3f(-groundLength/2, 0.0, -groundWidth/2);
+    glVertex3f(-groundLength/2, 0.0, groundWidth/2);
+    glVertex3f(groundLength/2, 0.0, groundWidth/2);
+    glVertex3f(groundLength/2, 0.0, -groundWidth/2);
+    glEnd();
+
     // Set material properties
     glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
     
-    // Draw Ground Mesh
     glPushMatrix();
-    //DrawMeshQM(&groundMesh, meshSize);
-    glPopMatrix();
-    glPushMatrix();
-    //glRotatef(45, 0.0, 0.0, 1.0);
-        triangle.draw();
+        prism.draw();
     glPopMatrix();
     
     glutSwapBuffers();   // Double buffering, swap buffers
@@ -167,13 +171,31 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
+        case 'n':
+            prism.rotateY(-5.0);
+            break;
+        case 'm':
+            prism.rotateY(5.0);
+            break;
+        case 'a':
+            prism.moveAlongGround(-1.0, 0);
+            break;
+        case 'd':
+            prism.moveAlongGround(1.0, 0);
+            break;
+        case 'w':
+            prism.moveAlongGround(0, -1.0);
+            break;
         case 's':
+            prism.moveAlongGround(0, 1.0);
+            break;
+        case 'z':
+            prism.changeNumSides(1);
+            break;
+        case 'x':
+            prism.changeNumSides(-1);
             break;
         case 'f':
-            break;
-        case 'b':
-            break;
-        case 'h':
             printControls();
             break;
     }
@@ -196,16 +218,16 @@ void keyboardUp(unsigned char key, int x, int y)
 void functionKeys(int key, int x, int y)
 {
     if (key == GLUT_KEY_DOWN){
-        triangle.rotation.x = triangle.rotation.x + 5;
+        prism.changeScaleFactors(Vector3D(0.0, -0.1, 0.0));
     }
     else if (key == GLUT_KEY_UP){
-        triangle.rotation.x = triangle.rotation.x - 5;
+        prism.changeScaleFactors(Vector3D(0.0, 0.1, 0.0));
     }
     else if (key == GLUT_KEY_LEFT){
-        triangle.rotation.y = triangle.rotation.y + 5;
+        prism.changeScaleFactors(Vector3D(-0.1, 0.0, -0.0));
     }
     else if (key == GLUT_KEY_RIGHT){
-        triangle.rotation.y = triangle.rotation.y - 5;
+        prism.changeScaleFactors(Vector3D(0.1, 0.0, 0.0));
     }
     glutPostRedisplay();   // Trigger a window redisplay
 }

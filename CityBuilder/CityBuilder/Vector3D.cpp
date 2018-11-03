@@ -47,9 +47,9 @@ float Vector3D::getLength()
     return (float)sqrt(x*x + y*y + z*z);
 }
 
-Vector3D* Vector3D::crossProduct(const Vector3D& lhs, const Vector3D& rhs)
+Vector3D Vector3D::crossProduct(const Vector3D& lhs, const Vector3D& rhs)
 {
-    return new Vector3D(lhs.y*rhs.z - lhs.z*rhs.y, lhs.z*rhs.x - lhs.x*rhs.z, lhs.x*rhs.y - lhs.y*rhs.x);
+    return Vector3D(lhs.y*rhs.z - lhs.z*rhs.y, lhs.z*rhs.x - lhs.x*rhs.z, lhs.x*rhs.y - lhs.y*rhs.x);
 }
 
 float Vector3D::DotProduct(const Vector3D& lhs, const Vector3D& rhs)
@@ -57,22 +57,22 @@ float Vector3D::DotProduct(const Vector3D& lhs, const Vector3D& rhs)
     return lhs.x*rhs.x + lhs.y*rhs.y + lhs.z*rhs.z;
 }
 
-Vector3D* Vector3D::add(const Vector3D& v1, const Vector3D& v2)
+Vector3D Vector3D::add(const Vector3D& v1, const Vector3D& v2)
 {
-    return new Vector3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    return Vector3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
 
-Vector3D* Vector3D::subtract(const Vector3D& v1, const Vector3D& v2)
+Vector3D Vector3D::subtract(const Vector3D& v1, const Vector3D& v2)
 {
-    return new Vector3D(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    return Vector3D(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
 
-Vector3D* Vector3D::scalarMul(const Vector3D& v, float rhs)
+Vector3D Vector3D::scalarMul(const Vector3D& v, float rhs)
 {
-    return new Vector3D(v.x * rhs, v.y * rhs, v.z * rhs);
+    return Vector3D(v.x * rhs, v.y * rhs, v.z * rhs);
 }
 
-Vector3D* Vector3D::negate(const Vector3D& v)
+Vector3D Vector3D::negate(const Vector3D& v)
 {
-    return new Vector3D(-v.x, -v.y, -v.z);
+    return Vector3D(-v.x, -v.y, -v.z);
 }
