@@ -10,6 +10,7 @@
 #define PrismMesh_hpp
 
 #include "Polygon.hpp"
+#include "Spline.hpp"
 #include <vector>
 #define PI 3.14159265
 

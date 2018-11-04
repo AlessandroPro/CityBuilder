@@ -28,6 +28,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E809BED0218F9A6D0064DC21 /* Spline.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Spline.hpp; sourceTree = "<group>"; };
 		E8BD4571218B54B400C0375C /* CityBuilder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CityBuilder; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8BD4574218B54B400C0375C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E8BD457C218B54ED00C0375C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -79,6 +80,7 @@
 				E8BD4592218BCABB00C0375C /* Polygon.cpp */,
 				E8BD4593218BCABB00C0375C /* Polygon.hpp */,
 				E8BD4595218BE94000C0375C /* PrismMesh.cpp */,
+				E809BED0218F9A6D0064DC21 /* Spline.hpp */,
 				E8BD4596218BE94000C0375C /* PrismMesh.hpp */,
 			);
 			path = CityBuilder;

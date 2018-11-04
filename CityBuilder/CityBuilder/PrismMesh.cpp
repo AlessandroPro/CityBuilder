@@ -78,25 +78,42 @@ void PrismMesh::buildwithFloors()
     int numFloors = ceil(initialHeight/floorHeight);
     std::vector<std::vector<Vector3D>> floors = {};
     
+    //SPLINE//
+    std::vector<double> cpIndices = {};
+    std::vector<double> cpScales = {1.0, 1.2, 1.0, 1.2, 1.0, 1.2};
+    double numControlPoints = 6;
+    double cpIndexInterval = numFloors/(numControlPoints-1);
+    for(int i = 0; i < numControlPoints; i++)
+    {
+        cpIndices.push_back(cpIndexInterval*i);
+        //cpScales.push_back(1.0);
+    }
+    tk::spline s;
+    s.set_points(cpIndices, cpScales);
+    
+    //END SPLINE//
+    
+    
     //Creates vertices for the building
     //redo with vector3D pointers
     std::vector<Vector3D> floor1Verts = {};
     for(int i = 0; i < numBaseEdges; i++)
     {
         float angle = (360.0/numBaseEdges)*i;
-        float x = sin(angle * PI / 180.0)*(initialHeight/2);
-        float z = cos(angle * PI / 180.0)*(initialHeight/2);
+        float x = (sin(angle * PI / 180.0)*(initialHeight/2));
+        float z = (cos(angle * PI / 180.0)*(initialHeight/2));
         floor1Verts.push_back(Vector3D(x, -(initialHeight/2), z));
     }
-    floors.push_back(floor1Verts);
     
     //redo with vector3D pointers
-    for(int i = 1; i <= numFloors; i++)
+    for(int i = 0; i <= numFloors; i++)
     {
         std::vector<Vector3D> nextFloorVerts = floor1Verts;
         for(int j = 0; j < numBaseEdges; j++)
         {
+            nextFloorVerts.at(j).x *= (float)s(i);
             nextFloorVerts.at(j).y = -(initialHeight/2) + (floorHeight*i);
+            nextFloorVerts.at(j).z *= (float)s(i);
         }
         floors.push_back(nextFloorVerts);
     }
