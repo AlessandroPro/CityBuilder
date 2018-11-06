@@ -22,6 +22,7 @@
 #include "Vector3D.hpp"
 #include "Polygon.hpp"
 #include "PrismMesh.hpp"
+#include "Building.hpp"
 #include <iostream>
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
@@ -31,10 +32,25 @@ static GLfloat mat_specular[] = { 0.4F, 0.2F, 0.4F, 1.0F };
 static GLfloat mat_diffuse[] = { 0.6F, 0.9F, 0.9F, 0.0F };
 static GLfloat mat_shininess[] = { 0.8F };
 
-const int groundLength = 36;    // Default ground length
-const int groundWidth = 36;    // Default ground height
-const int vWidth = 850;     // Viewport width in pixels
-const int vHeight = 500;    // Viewport height in pixels
+const int groundLength = 36;        // Default ground length
+const int groundWidth = 36;         // Default ground height
+static int windowWidth = 850;       // Window width in pixels
+static int windowHeight = 500;      // Window height in pixels
+const double cityViewportRatio = 0.8;// Window Width Ratio for the city viewport
+static int currentButton;           //Current mouse button being pressed
+
+//Boundaries of the spline viewport
+static GLdouble splineViewportX;
+static GLdouble splineViewportY;
+static GLdouble splineViewportWidth;
+static GLdouble splineViewportHeight;
+
+//Boundaries of the spline view world
+static GLdouble splineWorldLeft;
+static GLdouble splineWorldRight;
+static GLdouble splineWorldBottom;
+static GLdouble splineWorldTop;
+static const GLdouble splineWorldHeight = 120;
 
 // Light properties
 static GLfloat light_position0[] = { -6.0F, 12.0F, 0.0F, 1.0F };
@@ -42,7 +58,7 @@ static GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_ambient[] = { 0.2F, 0.2F, 0.2F, 1.0F };
 
-PrismMesh prism;
+Building prism;
 
 // Prototypes for functions in this module
 void initOpenGL(int w, int h);
@@ -52,7 +68,9 @@ void keyboard(unsigned char key, int x, int y);
 void keyboardUp(unsigned char key, int x, int y);
 void functionKeys(int key, int x, int y);
 void functionKeysUp(int key, int x, int y);
-Vector3D* ScreenToWorld(int x, int y);
+void mouseButtonHandler(int button, int state, int xMouse, int yMouse);
+void mouseMotionHandler(int xMouse, int yMouse);
+Vector3D screenToWorld2D(int x, int y, float wvRight, float wvLeft, float wvTop, float wvBottom, float vpWidth, float vpHeight);
 void printControls();
 
 
@@ -61,12 +79,12 @@ int main(int argc, char **argv)
     // Initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(vWidth, vHeight);
+    glutInitWindowSize(windowWidth, windowHeight);
     glutInitWindowPosition(200, 30);
     glutCreateWindow("Assignment 2 - City Builder");
     
     // Initialize GL
-    initOpenGL(vWidth, vHeight);
+    initOpenGL(windowWidth, windowHeight);
     
     // Register callbacks
     glutDisplayFunc(display);
@@ -76,6 +94,8 @@ int main(int argc, char **argv)
     glutSpecialUpFunc(functionKeysUp);
     glutKeyboardUpFunc(keyboardUp);
     glutIdleFunc(display);
+    glutMouseFunc(mouseButtonHandler);
+    glutMotionFunc(mouseMotionHandler);
     
     
     // Start event loop, never returns
@@ -104,19 +124,6 @@ void initOpenGL(int w, int h)
     glClearDepth(1.0f);
     glEnable(GL_NORMALIZE);    // Renormalize normal vectors
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);   // Nicer perspective
-    
-//    // Set up ground quad mesh
-//    Vector3D origin = NewVector3D(-18.0f, 0.0f, 18.0f);
-//    Vector3D dir1v = NewVector3D(1.0f, 0.0f, 0.0f);
-//    Vector3D dir2v = NewVector3D(0.0f, 0.0f, -1.0f);
-//    groundMesh = NewQuadMesh(meshSize);
-//    InitMeshQM(&groundMesh, meshSize, origin, 36.0, 36.0, dir1v, dir2v);
-//
-//    Vector3D ambient = NewVector3D(0.0f, 0.05f, 0.0f);
-//    Vector3D diffuse = NewVector3D(0.4f, 0.8f, 0.4f);
-//    Vector3D specular = NewVector3D(0.04f, 0.04f, 0.04f);
-//    SetMaterialQM(&groundMesh, ambient, diffuse, specular, 0.2);
-    
 }
 
 
@@ -125,6 +132,18 @@ void initOpenGL(int w, int h)
 void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    //City view viewport
+    // Set up viewport, projection, then change to modelview matrix mode -
+    // display function will then set up camera and do modeling transforms.
+    glViewport(0, 0, (GLsizei)windowWidth*cityViewportRatio, (GLsizei)windowHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60.0, (GLdouble)windowWidth*cityViewportRatio / windowHeight, 0.2, 40.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    // Set up the camera at position (0, 6, 22) looking at the origin, up along positive y axis
+    gluLookAt(0.0, 6.0, 22.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     
     //Draw ground quad
     glBegin(GL_QUADS);
@@ -142,7 +161,21 @@ void display(void)
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
     
     glPushMatrix();
-        prism.draw();
+    prism.draw();
+    glPopMatrix();
+    
+    //Spline view viewport
+    // Set up viewport, projection, then change to modelview matrix mode -
+    // display function will then set up camera and do modeling transforms.
+    glViewport((GLint)splineViewportX, (GLint)splineViewportY, (GLsizei)splineViewportWidth, (GLsizei)splineViewportHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(splineWorldLeft, splineWorldRight, splineWorldBottom, splineWorldTop);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glPushMatrix();
+    prism.drawSpline((float)(splineWorldHeight-20.0)); //10 units of top padding, 10 units bottom padding
     glPopMatrix();
     
     glutSwapBuffers();   // Double buffering, swap buffers
@@ -151,19 +184,21 @@ void display(void)
 // Callback, called at initialization and whenever user resizes the window.
 void reshape(int w, int h)
 {
-    // Set up viewport, projection, then change to modelview matrix mode -
-    // display function will then set up camera and do modeling transforms.
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+    windowWidth = w;
+    windowHeight = h;
     
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60.0, (GLdouble)w / h, 0.2, 40.0);
+    //Boundaries of the spline viewport
+    splineViewportX  = windowWidth*cityViewportRatio;
+    splineViewportY =  0;
+    splineViewportWidth = windowWidth-splineViewportX;
+    splineViewportHeight = windowHeight;
     
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
-    // Set up the camera at position (0, 6, 22) looking at the origin, up along positive y axis
-    gluLookAt(0.0, 6.0, 22.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    //Boundaries of the spline view world
+    double splineWorldWidth = splineWorldHeight*(splineViewportWidth/splineViewportHeight);
+    splineWorldLeft =  -(splineWorldWidth/2.0);
+    splineWorldRight = splineWorldWidth/2.0;
+    splineWorldBottom = -10.0;
+    splineWorldTop = splineWorldBottom + splineWorldHeight;
 }
 
 // Callback, handles input from the keyboard, non-arrow keys
@@ -224,10 +259,12 @@ void functionKeys(int key, int x, int y)
         prism.changeScaleFactors(Vector3D(0.0, 0.1, 0.0));
     }
     else if (key == GLUT_KEY_LEFT){
-        prism.changeScaleFactors(Vector3D(-0.1, 0.0, -0.0));
+        //prism.changeScaleFactors(Vector3D(-0.1, 0.0, -0.0));
+        prism.changeSplineControlPoint(3, 0.1);
     }
     else if (key == GLUT_KEY_RIGHT){
-        prism.changeScaleFactors(Vector3D(0.1, 0.0, 0.0));
+        //prism.changeScaleFactors(Vector3D(0.1, 0.0, 0.0));
+        prism.changeSplineControlPoint(3, -0.1);
     }
     glutPostRedisplay();   // Trigger a window redisplay
 }
@@ -247,10 +284,53 @@ void functionKeysUp(int key, int x, int y)
 }
 
 
-Vector3D* ScreenToWorld(int x, int y)
+Vector3D screenToWorld2D(int x, int y, float wvRight, float wvLeft, float wvTop, float wvBottom, float vpWidth, float vpHeight)
 {
-    // you will need to finish this if you use the mouse
-    return new Vector3D(0.0, 0.0, 0.0);
+    float xCamera = ((wvRight-wvLeft)/vpWidth)  * x;
+    float yCamera = ((wvTop-wvBottom)/vpHeight) * (vpHeight-y);
+    
+    return Vector3D(xCamera + wvLeft, yCamera + wvBottom, 0);
+}
+
+void mouseButtonHandler(int button, int state, int xMouse, int yMouse)
+{
+    currentButton = button;
+    
+    if (button == GLUT_LEFT_BUTTON)
+    {
+        switch (state)
+        {
+            case GLUT_DOWN:
+                //std::cout << xMouse << ", " << yMouse << "\n";
+                break;
+        }
+    }
+    else if (button == GLUT_MIDDLE_BUTTON)
+    {
+        
+    }
+    
+    /* Schedule a call to display() */
+    glutPostRedisplay();
+}
+
+void mouseMotionHandler(int xMouse, int yMouse)
+{
+    if (currentButton == GLUT_LEFT_BUTTON)
+    {
+        //std::cout << xMouse << ", " << yMouse << "\n";
+        Vector3D worldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse - splineViewportY, splineWorldRight, splineWorldLeft, splineWorldTop, splineWorldBottom, splineViewportWidth, splineViewportHeight);
+        std::cout << worldPoint.x << ", " << worldPoint.y << "\n\n";
+        prism.shiftSplineControlPoint(worldPoint.x, worldPoint.y, splineWorldHeight-20.0);
+
+    }
+    else if (currentButton == GLUT_MIDDLE_BUTTON)
+    {
+        
+    }
+    
+    /* Schedule a call to display() */
+    glutPostRedisplay();
 }
 
 // Prints the controls to the standard output

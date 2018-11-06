@@ -11,12 +11,23 @@
 PrismMesh::PrismMesh():
     numBaseEdges(4),
     rotationY(0.0),
-    initialHeight(7.0),
+    initialHeight(5.0),
     currentHeight(initialHeight),
     scaleFactors(Vector3D(1.0, 1.0, 1.0)),
     position(Vector3D(0.0, initialHeight/2, 0.0))
     {
-        buildwithFloors();
+        build();
+    }
+
+PrismMesh::PrismMesh(int numEdges, float height, float rotY, float posX, float posZ, Vector3D scale):
+    numBaseEdges(numEdges),
+    rotationY(rotY),
+    initialHeight(height),
+    currentHeight(initialHeight),
+    scaleFactors(scale),
+    position(Vector3D(posX, initialHeight/2, posZ))
+    {
+        build();
     }
 
 void PrismMesh::draw()
@@ -26,8 +37,8 @@ void PrismMesh::draw()
     glRotatef(rotationY, 0.0, 1.0, 0.0);
     glScalef(scaleFactors.x, scaleFactors.y, scaleFactors.z);
     glTranslatef(0.0, position.y, 0.0);
-    //baseBottom.draw();
-    //baseTop.draw();
+    baseBottom.draw();
+    baseTop.draw();
     for (auto& quad : quads)
     {
         quad.draw();
@@ -72,77 +83,6 @@ void PrismMesh::build()
 }
 
 
-void PrismMesh::buildwithFloors()
-{
-    float floorHeight = 1.0;
-    int numFloors = ceil(initialHeight/floorHeight);
-    std::vector<std::vector<Vector3D>> floors = {};
-    
-    //SPLINE//
-    std::vector<double> cpIndices = {};
-    std::vector<double> cpScales = {1.0, 1.2, 1.0, 1.2, 1.0, 1.2};
-    double numControlPoints = 6;
-    double cpIndexInterval = numFloors/(numControlPoints-1);
-    for(int i = 0; i < numControlPoints; i++)
-    {
-        cpIndices.push_back(cpIndexInterval*i);
-        //cpScales.push_back(1.0);
-    }
-    tk::spline s;
-    s.set_points(cpIndices, cpScales);
-    
-    //END SPLINE//
-    
-    
-    //Creates vertices for the building
-    //redo with vector3D pointers
-    std::vector<Vector3D> floor1Verts = {};
-    for(int i = 0; i < numBaseEdges; i++)
-    {
-        float angle = (360.0/numBaseEdges)*i;
-        float x = (sin(angle * PI / 180.0)*(initialHeight/2));
-        float z = (cos(angle * PI / 180.0)*(initialHeight/2));
-        floor1Verts.push_back(Vector3D(x, -(initialHeight/2), z));
-    }
-    
-    //redo with vector3D pointers
-    for(int i = 0; i <= numFloors; i++)
-    {
-        std::vector<Vector3D> nextFloorVerts = floor1Verts;
-        for(int j = 0; j < numBaseEdges; j++)
-        {
-            nextFloorVerts.at(j).x *= (float)s(i);
-            nextFloorVerts.at(j).y = -(initialHeight/2) + (floorHeight*i);
-            nextFloorVerts.at(j).z *= (float)s(i);
-        }
-        floors.push_back(nextFloorVerts);
-    }
-    
-    //Creates quads for the building
-    quads.clear();
-    for(int i = 0; i < numFloors; i++)
-    {
-        for(int j = 0; j < numBaseEdges; j++)
-        {
-            Polygon newQuad = Polygon();
-            newQuad.verts.push_back(floors.at(i).at(j));
-            newQuad.verts.push_back(floors.at(i + 1).at(j));
-            if(j == 0)
-            {
-                newQuad.verts.push_back(floors.at(i + 1).at(numBaseEdges-1));
-                newQuad.verts.push_back(floors.at(i).at(numBaseEdges-1));
-            }
-            else{
-                newQuad.verts.push_back(floors.at(i + 1).at(j-1));
-                newQuad.verts.push_back(floors.at(i).at(j-1));
-            }
-            newQuad.calculateNormal();
-            quads.push_back(newQuad);
-        }
-    }
-}
-
-
 void PrismMesh::changeNumSides(int changeNum)
 {
     numBaseEdges += changeNum;
@@ -150,7 +90,7 @@ void PrismMesh::changeNumSides(int changeNum)
     {
         numBaseEdges = 3;
     }
-    buildwithFloors();
+    build();
 }
 
 void PrismMesh::rotateY(float deltaY)
@@ -185,7 +125,7 @@ void PrismMesh::changeScaleFactors(Vector3D scaleDeltas)
         scaleFactors.z = minScaleFactor;
     }
     
-    currentHeight *= scaleFactors.y;
+    currentHeight = initialHeight * scaleFactors.y;
 }
 
 

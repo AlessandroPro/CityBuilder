@@ -12,10 +12,13 @@
 #include "Polygon.hpp"
 #include "Spline.hpp"
 #include <vector>
+#include <iostream>
 #define PI 3.14159265
 
 class PrismMesh
 {
+    
+protected:
     int numBaseEdges;
     float rotationY;
     const float initialHeight;
@@ -31,9 +34,9 @@ public:
     std::vector<Polygon> quads;
     
     PrismMesh();
+    PrismMesh(int numEdges, float height, float rotY, float posX, float posZ, Vector3D scale);
     void draw();
     void build();
-    void buildwithFloors();
     void changeNumSides(int changeNum);
     void rotateY(float deltaY);
     void moveAlongGround(float deltaX, float deltaY);
