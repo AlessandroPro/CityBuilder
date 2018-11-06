@@ -23,6 +23,7 @@ class Building : public PrismMesh
     const double numControlPoints = 6;
     std::vector<double> cpScales;
     tk::spline verticalSpline;
+    int selectedControlPoint;
     
 public:
     
@@ -34,7 +35,9 @@ public:
     tk::spline createSpline();
     void drawSpline(float yLength);
     void changeSplineControlPoint(int cpIndex, float deltaX);
-    void shiftSplineControlPoint(float wvX, float wvY, float yLength);
+    void checkSplineControlPoint(float wvX, float wvY, float yLength);
+    void selectSplineControlPoint(int cpIndex);
+    void shiftSelectedSplineControlPoint(float wvX, float yLength);
 };
 
 #endif /* Building_hpp */

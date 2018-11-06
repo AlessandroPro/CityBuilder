@@ -33,7 +33,7 @@ void Polygon::calculateNormal()
 
 void Polygon::draw()
 {
-    glBegin(GL_LINE_LOOP);
+    glBegin(GL_POLYGON);
     glNormal3f(normal.x, normal.y, normal.z);
     for(int i = 0; i < verts.size(); i++){
         //std::cout << i << "\n";

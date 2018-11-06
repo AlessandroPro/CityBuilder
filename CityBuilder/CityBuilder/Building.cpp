@@ -10,7 +10,8 @@
 
 Building::Building():
     PrismMesh(),
-    floorHeight(0.1)
+    floorHeight(0.1),
+    selectedControlPoint(-1)
     {
         for(int i = 0; i < numControlPoints; i++)
         {
@@ -21,7 +22,8 @@ Building::Building():
 
 Building::Building(int numEdges, float height, float rotY, float posX, float posY, Vector3D scale, float floorHeight):
     PrismMesh(numEdges, height, rotY, posX, posY, scale),
-    floorHeight(floorHeight)
+    floorHeight(floorHeight),
+    selectedControlPoint(-1)
     {
         for(int i = 0; i < numControlPoints; i++)
         {
@@ -167,7 +169,7 @@ void Building::changeSplineControlPoint(int cpIndex, float newX)
     }
 }
 
-void Building::shiftSplineControlPoint(float wvX, float wvY, float yLength)
+void Building::checkSplineControlPoint(float wvX, float wvY, float yLength)
 {
     int numFloors = getNumFloors();
     float splineFloorHeight = yLength/numFloors;
@@ -178,12 +180,25 @@ void Building::shiftSplineControlPoint(float wvX, float wvY, float yLength)
     {
         float cpX = verticalSpline(cpIndexInterval*i)*lengthHeightRatio-lengthHeightRatio;
         float cpY = splineFloorHeight*cpIndexInterval*i;
-        std::cout << "ORIGINAL X: " << cpX << "\n";
-        std::cout << "ORIGINAL Y: " << cpY << "\n\n";
+        //std::cout << "ORIGINAL X: " << cpX << "\n";
+        //std::cout << "ORIGINAL Y: " << cpY << "\n\n";
         if(abs(cpX - wvX) < 2.5 && abs(cpY - wvY) < 2.5){
             //This is the selected control point
-            changeSplineControlPoint(i, (wvX + lengthHeightRatio)/lengthHeightRatio);
+            selectSplineControlPoint(i);
             break;
         }
     }
+}
+
+void Building::selectSplineControlPoint(int cpIndex)
+{
+    selectedControlPoint = cpIndex;
+}
+
+void Building::shiftSelectedSplineControlPoint(float wvX, float yLength)
+{
+    int numFloors = getNumFloors();
+    float splineFloorHeight = yLength/numFloors;
+    float lengthHeightRatio = yLength/initialHeight;
+    changeSplineControlPoint(selectedControlPoint, (wvX + lengthHeightRatio)/lengthHeightRatio);
 }

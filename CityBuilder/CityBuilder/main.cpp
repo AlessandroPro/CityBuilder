@@ -58,7 +58,9 @@ static GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_ambient[] = { 0.2F, 0.2F, 0.2F, 1.0F };
 
-Building prism;
+static std::vector<Building*> buildings = {};
+static Building* building = new Building();
+
 
 // Prototypes for functions in this module
 void initOpenGL(int w, int h);
@@ -96,7 +98,6 @@ int main(int argc, char **argv)
     glutIdleFunc(display);
     glutMouseFunc(mouseButtonHandler);
     glutMotionFunc(mouseMotionHandler);
-    
     
     // Start event loop, never returns
     glutMainLoop();
@@ -161,7 +162,11 @@ void display(void)
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
     
     glPushMatrix();
-    prism.draw();
+    for(int i = 0; i < buildings.size(); i++)
+    {
+        buildings.at(i)->draw();
+    }
+    building->draw();
     glPopMatrix();
     
     //Spline view viewport
@@ -175,7 +180,7 @@ void display(void)
     glLoadIdentity();
 
     glPushMatrix();
-    prism.drawSpline((float)(splineWorldHeight-20.0)); //10 units of top padding, 10 units bottom padding
+    building->drawSpline((float)(splineWorldHeight-20.0)); //10 units of top padding, 10 units bottom padding
     glPopMatrix();
     
     glutSwapBuffers();   // Double buffering, swap buffers
@@ -191,7 +196,7 @@ void reshape(int w, int h)
     splineViewportX  = windowWidth*cityViewportRatio;
     splineViewportY =  0;
     splineViewportWidth = windowWidth-splineViewportX;
-    splineViewportHeight = windowHeight;
+    splineViewportHeight = windowHeight*0.8;
     
     //Boundaries of the spline view world
     double splineWorldWidth = splineWorldHeight*(splineViewportWidth/splineViewportHeight);
@@ -207,29 +212,35 @@ void keyboard(unsigned char key, int x, int y)
     switch (key)
     {
         case 'n':
-            prism.rotateY(-5.0);
+            building->rotateY(-5.0);
             break;
         case 'm':
-            prism.rotateY(5.0);
+            building->rotateY(5.0);
             break;
         case 'a':
-            prism.moveAlongGround(-1.0, 0);
+            building->moveAlongGround(-1.0, 0);
             break;
         case 'd':
-            prism.moveAlongGround(1.0, 0);
+            building->moveAlongGround(1.0, 0);
             break;
         case 'w':
-            prism.moveAlongGround(0, -1.0);
+            building->moveAlongGround(0, -1.0);
             break;
         case 's':
-            prism.moveAlongGround(0, 1.0);
+            building->moveAlongGround(0, 1.0);
             break;
         case 'z':
-            prism.changeNumSides(1);
+            building->changeNumSides(1);
             break;
         case 'x':
-            prism.changeNumSides(-1);
+            building->changeNumSides(-1);
             break;
+        case 'g':
+        {
+            buildings.push_back(building);
+            building = new Building();
+            break;
+        }
         case 'f':
             printControls();
             break;
@@ -253,18 +264,16 @@ void keyboardUp(unsigned char key, int x, int y)
 void functionKeys(int key, int x, int y)
 {
     if (key == GLUT_KEY_DOWN){
-        prism.changeScaleFactors(Vector3D(0.0, -0.1, 0.0));
+        building->changeScaleFactors(Vector3D(0.0, -0.1, 0.0));
     }
     else if (key == GLUT_KEY_UP){
-        prism.changeScaleFactors(Vector3D(0.0, 0.1, 0.0));
+        building->changeScaleFactors(Vector3D(0.0, 0.1, 0.0));
     }
     else if (key == GLUT_KEY_LEFT){
-        //prism.changeScaleFactors(Vector3D(-0.1, 0.0, -0.0));
-        prism.changeSplineControlPoint(3, 0.1);
+        building->changeScaleFactors(Vector3D(-0.1, 0.0, -0.0));
     }
     else if (key == GLUT_KEY_RIGHT){
-        //prism.changeScaleFactors(Vector3D(0.1, 0.0, 0.0));
-        prism.changeSplineControlPoint(3, -0.1);
+        building->changeScaleFactors(Vector3D(0.1, 0.0, 0.0));
     }
     glutPostRedisplay();   // Trigger a window redisplay
 }
@@ -284,10 +293,10 @@ void functionKeysUp(int key, int x, int y)
 }
 
 
-Vector3D screenToWorld2D(int x, int y, float wvRight, float wvLeft, float wvTop, float wvBottom, float vpWidth, float vpHeight)
+Vector3D screenToWorld2D(int x, int y, float wvRight, float wvLeft, float wvTop, float wvBottom, float vpWidth, float vpHeight, float windowHeight)
 {
     float xCamera = ((wvRight-wvLeft)/vpWidth)  * x;
-    float yCamera = ((wvTop-wvBottom)/vpHeight) * (vpHeight-y);
+    float yCamera = ((wvTop-wvBottom)/vpHeight) * (windowHeight-y);
     
     return Vector3D(xCamera + wvLeft, yCamera + wvBottom, 0);
 }
@@ -301,8 +310,15 @@ void mouseButtonHandler(int button, int state, int xMouse, int yMouse)
         switch (state)
         {
             case GLUT_DOWN:
-                //std::cout << xMouse << ", " << yMouse << "\n";
+            {
+                Vector3D worldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse, splineWorldRight, splineWorldLeft,
+                                                      splineWorldTop, splineWorldBottom, splineViewportWidth, splineViewportHeight, windowHeight);
+                std::cout << worldPoint.x << ", " << worldPoint.y << "\n";
+                building->checkSplineControlPoint(worldPoint.x, worldPoint.y, splineWorldHeight-20.0);
                 break;
+            }
+            case GLUT_UP:
+                building->selectSplineControlPoint(-1);
         }
     }
     else if (button == GLUT_MIDDLE_BUTTON)
@@ -318,15 +334,9 @@ void mouseMotionHandler(int xMouse, int yMouse)
 {
     if (currentButton == GLUT_LEFT_BUTTON)
     {
-        //std::cout << xMouse << ", " << yMouse << "\n";
-        Vector3D worldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse - splineViewportY, splineWorldRight, splineWorldLeft, splineWorldTop, splineWorldBottom, splineViewportWidth, splineViewportHeight);
-        std::cout << worldPoint.x << ", " << worldPoint.y << "\n\n";
-        prism.shiftSplineControlPoint(worldPoint.x, worldPoint.y, splineWorldHeight-20.0);
-
-    }
-    else if (currentButton == GLUT_MIDDLE_BUTTON)
-    {
-        
+        Vector3D worldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse, splineWorldRight, splineWorldLeft,
+                                              splineWorldTop, splineWorldBottom, splineViewportWidth, splineViewportHeight, windowHeight);
+        building->shiftSelectedSplineControlPoint(worldPoint.x, splineWorldHeight-20.0);
     }
     
     /* Schedule a call to display() */
