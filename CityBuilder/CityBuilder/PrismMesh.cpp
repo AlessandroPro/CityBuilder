@@ -9,7 +9,7 @@
 #include "PrismMesh.hpp"
 
 PrismMesh::PrismMesh():
-    numBaseEdges(4),
+    numBaseEdges(5),
     rotationY(0.0),
     initialHeight(5.0),
     currentHeight(initialHeight),
@@ -54,6 +54,11 @@ void PrismMesh::build()
     for(int i = 0; i < numBaseEdges; i++)
     {
         float angle = (360.0/numBaseEdges)*i;
+        if(numBaseEdges == 4)
+        {
+            //Better alignment for scaling rectangles/squares
+            angle += 45;
+        }
         float x = sin(angle * PI / 180.0)*(initialHeight/2);
         float z = cos(angle * PI / 180.0)*(initialHeight/2);
         baseBottom.verts.push_back(Vector3D(x, -(initialHeight/2), z));

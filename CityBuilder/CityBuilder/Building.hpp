@@ -21,23 +21,31 @@ class Building : public PrismMesh
 {
     float floorHeight;
     const double numControlPoints = 6;
-    std::vector<double> cpScales;
+    std::vector<double> cpSplineScales;
+    std::vector<double> cpBaseScales;
     tk::spline verticalSpline;
-    int selectedControlPoint;
+    int selectedSplineCP;
+    int selectedBaseCP;
     
 public:
     
     Building();
     Building(int numEdges, float height, float rotY, float posX, float posY, Vector3D scale, float floorHeight);
+    void initializeCpScales();
     void build();
     void changeNumSides(int changeNum);
     int getNumFloors();
     tk::spline createSpline();
     void drawSpline(float yLength);
+    void drawBase();
     void changeSplineControlPoint(int cpIndex, float deltaX);
     void checkSplineControlPoint(float wvX, float wvY, float yLength);
     void selectSplineControlPoint(int cpIndex);
     void shiftSelectedSplineControlPoint(float wvX, float yLength);
+    void checkBaseControlPoint(float wvX, float wvY);
+    void selectBaseControlPoint(int cpIndex);
+    void shiftSelectedBaseControlPoint(float wvX, float wvY);
+    void changeBaseControlPoint(int cpIndex, float newScale);
 };
 
 #endif /* Building_hpp */

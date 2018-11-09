@@ -32,12 +32,12 @@ static GLfloat mat_specular[] = { 0.4F, 0.2F, 0.4F, 1.0F };
 static GLfloat mat_diffuse[] = { 0.6F, 0.9F, 0.9F, 0.0F };
 static GLfloat mat_shininess[] = { 0.8F };
 
-const int groundLength = 36;        // Default ground length
-const int groundWidth = 36;         // Default ground height
-static int windowWidth = 850;       // Window width in pixels
-static int windowHeight = 500;      // Window height in pixels
-const double cityViewportRatio = 0.8;// Window Width Ratio for the city viewport
-static int currentButton;           //Current mouse button being pressed
+const int groundLength = 36;         // Default ground length
+const int groundWidth = 36;          // Default ground height
+static int windowWidth = 850;        // Window width in pixels
+static int windowHeight = 500;       // Window height in pixels
+const double cityViewportRatio = 0.7;// Window Width Ratio for the city viewport
+static int currentButton;            //Current mouse button being pressed
 
 //Boundaries of the spline viewport
 static GLdouble splineViewportX;
@@ -51,6 +51,19 @@ static GLdouble splineWorldRight;
 static GLdouble splineWorldBottom;
 static GLdouble splineWorldTop;
 static const GLdouble splineWorldHeight = 120;
+
+//Boundaries of the base viewport
+static GLdouble baseViewportX;
+static GLdouble baseViewportY;
+static GLdouble baseViewportWidth;
+static GLdouble baseViewportHeight;
+
+//Boundaries of the base view world
+static GLdouble baseWorldLeft;
+static GLdouble baseWorldRight;
+static GLdouble baseWorldBottom;
+static GLdouble baseWorldTop;
+static const GLdouble baseWorldHeight = 10;
 
 // Light properties
 static GLfloat light_position0[] = { -6.0F, 12.0F, 0.0F, 1.0F };
@@ -179,8 +192,21 @@ void display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glPushMatrix();
     building->drawSpline((float)(splineWorldHeight-20.0)); //10 units of top padding, 10 units bottom padding
+    
+    //Base view viewport
+    // Set up viewport, projection, then change to modelview matrix mode -
+    // display function will then set up camera and do modeling transforms.
+    glViewport((GLint)baseViewportX, (GLint)baseViewportY, (GLsizei)baseViewportWidth, (GLsizei)baseViewportHeight);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(baseWorldLeft, baseWorldRight, baseWorldBottom, baseWorldTop);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    glPushMatrix();
+    glRotatef(90, 1.0, 0, 0);
+    building->drawBase();
     glPopMatrix();
     
     glutSwapBuffers();   // Double buffering, swap buffers
@@ -196,7 +222,7 @@ void reshape(int w, int h)
     splineViewportX  = windowWidth*cityViewportRatio;
     splineViewportY =  0;
     splineViewportWidth = windowWidth-splineViewportX;
-    splineViewportHeight = windowHeight*0.8;
+    splineViewportHeight = windowHeight*0.6;
     
     //Boundaries of the spline view world
     double splineWorldWidth = splineWorldHeight*(splineViewportWidth/splineViewportHeight);
@@ -204,6 +230,19 @@ void reshape(int w, int h)
     splineWorldRight = splineWorldWidth/2.0;
     splineWorldBottom = -10.0;
     splineWorldTop = splineWorldBottom + splineWorldHeight;
+    
+    //Boundaries of the base viewport
+    baseViewportX  = windowWidth*cityViewportRatio;
+    baseViewportY =  splineViewportHeight;
+    baseViewportWidth = windowWidth-baseViewportX;
+    baseViewportHeight = windowHeight-splineViewportHeight;
+    
+    //Boundaries of the base view world
+    double baseWorldWidth = baseWorldHeight*(baseViewportWidth/baseViewportHeight);
+    baseWorldLeft =  -(baseWorldWidth/2.0);
+    baseWorldRight = baseWorldWidth/2.0;
+    baseWorldBottom = -5.0;
+    baseWorldTop = baseWorldBottom + baseWorldHeight;
 }
 
 // Callback, handles input from the keyboard, non-arrow keys
@@ -311,14 +350,19 @@ void mouseButtonHandler(int button, int state, int xMouse, int yMouse)
         {
             case GLUT_DOWN:
             {
-                Vector3D worldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse, splineWorldRight, splineWorldLeft,
-                                                      splineWorldTop, splineWorldBottom, splineViewportWidth, splineViewportHeight, windowHeight);
-                std::cout << worldPoint.x << ", " << worldPoint.y << "\n";
-                building->checkSplineControlPoint(worldPoint.x, worldPoint.y, splineWorldHeight-20.0);
+                Vector3D splineWorldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse, splineWorldRight, splineWorldLeft,
+                    splineWorldTop, splineWorldBottom, splineViewportWidth, splineViewportHeight, windowHeight);
+                //std::cout << worldPoint.x << ", " << worldPoint.y << "\n";
+                building->checkSplineControlPoint(splineWorldPoint.x, splineWorldPoint.y, splineWorldHeight-20.0);
+                
+                Vector3D baseWorldPoint = screenToWorld2D(xMouse - baseViewportX, windowHeight-baseViewportHeight+yMouse, baseWorldRight, baseWorldLeft,baseWorldTop, baseWorldBottom, baseViewportWidth, baseViewportHeight, windowHeight);
+                //std::cout << baseWorldPoint.x << ", " << baseWorldPoint.y << "\n";
+                building->checkBaseControlPoint(baseWorldPoint.x, baseWorldPoint.y);
                 break;
             }
             case GLUT_UP:
                 building->selectSplineControlPoint(-1);
+                building->selectBaseControlPoint(-1);
         }
     }
     else if (button == GLUT_MIDDLE_BUTTON)
@@ -334,9 +378,12 @@ void mouseMotionHandler(int xMouse, int yMouse)
 {
     if (currentButton == GLUT_LEFT_BUTTON)
     {
-        Vector3D worldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse, splineWorldRight, splineWorldLeft,
+        Vector3D splineWorldPoint = screenToWorld2D(xMouse - splineViewportX, yMouse, splineWorldRight, splineWorldLeft,
                                               splineWorldTop, splineWorldBottom, splineViewportWidth, splineViewportHeight, windowHeight);
-        building->shiftSelectedSplineControlPoint(worldPoint.x, splineWorldHeight-20.0);
+        building->shiftSelectedSplineControlPoint(splineWorldPoint.x, splineWorldHeight-20.0);
+        
+        Vector3D baseWorldPoint = screenToWorld2D(xMouse - baseViewportX, windowHeight-baseViewportHeight+yMouse, baseWorldRight, baseWorldLeft,baseWorldTop, baseWorldBottom, baseViewportWidth, baseViewportHeight, windowHeight);
+        building->shiftSelectedBaseControlPoint(baseWorldPoint.x, baseWorldPoint.y);
     }
     
     /* Schedule a call to display() */
