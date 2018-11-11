@@ -12,10 +12,14 @@
 #include <stdio.h>
 #include "Polygon.hpp"
 #include "PrismMesh.hpp"
-#include "Spline.hpp"
+#include "Spline.cpp"
 #include <vector>
 #include <iostream>
+#include <string>
+#include <sstream>
 #define PI 3.14159265
+
+using namespace std;
 
 class Building : public PrismMesh
 {
@@ -34,6 +38,7 @@ public:
     void initializeCpScales();
     void build();
     void changeNumSides(int changeNum);
+    void changeScaleFactors(Vector3D scaleDeltas);
     int getNumFloors();
     tk::spline createSpline();
     void drawSpline(float yLength);
@@ -46,6 +51,8 @@ public:
     void selectBaseControlPoint(int cpIndex);
     void shiftSelectedBaseControlPoint(float wvX, float wvY);
     void changeBaseControlPoint(int cpIndex, float newScale);
+    string getMetaData();
+    void processMetaData(string md);
 };
 
 #endif /* Building_hpp */

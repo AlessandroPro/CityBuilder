@@ -10,7 +10,7 @@
 
 Building::Building():
     PrismMesh(),
-    floorHeight(0.1),
+    floorHeight(0.03),
     selectedSplineCP(-1),
     selectedBaseCP(-1)
     {
@@ -45,14 +45,13 @@ void Building::build()
 {
     int numFloors = getNumFloors();
     float preFloorHeight = initialHeight/numFloors; //Floor height before vertical scaling is applied
-    std::vector<std::vector<Vector3D>> floors = {};
+    vector< vector<Vector3D> > floors;
     
     //Spline curve function used for determining the extrusion factor for each floor
     verticalSpline = createSpline();
     
     //Creates vertices for the building
-    //redo with vector3D pointers
-    std::vector<Vector3D> floor1Verts = {};
+    vector<Vector3D> floor1Verts;
     for(int i = 0; i < numBaseEdges; i++)
     {
         float angle = (360.0/numBaseEdges)*i;
@@ -66,10 +65,9 @@ void Building::build()
         floor1Verts.push_back(Vector3D(x, -(initialHeight/2), z));
     }
     
-    //redo with vector3D pointers
     for(int i = 0; i <= numFloors; i++)
     {
-        std::vector<Vector3D> nextFloorVerts = floor1Verts;
+        vector<Vector3D> nextFloorVerts = floor1Verts;
         for(int j = 0; j < numBaseEdges; j++)
         {
             nextFloorVerts.at(j).x *= (float)verticalSpline(i);
@@ -147,7 +145,7 @@ int Building::getNumFloors()
 tk::spline Building::createSpline()
 {
     int numFloors = getNumFloors();
-    std::vector<double> cpIndices = {};
+    vector<double> cpIndices;
     double cpIndexInterval = numFloors/(numControlPoints-1);
     for(int i = 0; i < numControlPoints; i++)
     {
@@ -169,7 +167,6 @@ void Building::drawSpline(float yLength)
     for(int i = 0; i <= numFloors; i++){
         float vX = verticalSpline(i)*lengthHeightRatio-lengthHeightRatio;
         float vY = splineFloorHeight*i;
-        //std::cout << vX << ", " << vY << "\n";
         glVertex3f(vX, vY, 0);
     }
     glEnd();
@@ -189,21 +186,20 @@ void Building::drawSpline(float yLength)
 void Building::drawBase()
 {
     glPushMatrix();
-    glRotatef(rotationY, 0.0, 1.0, 0.0);
-    for(int i = 0; i <baseBottom.verts.size(); i++)
+    Polygon base = baseBottom;
+    //glRotatef(rotationY, 0.0, 1.0, 0.0);
+    for(int i = 0; i <base.verts.size(); i++)
     {
+        base.verts.at(i).x *= scaleFactors.x / verticalSpline(0);
+        base.verts.at(i).z *= scaleFactors.z / verticalSpline(0);
         glPushMatrix();
-        float cpX = baseBottom.verts.at(i).x*scaleFactors.x;
-        float cpZ = baseBottom.verts.at(i).z*scaleFactors.z;
-        glTranslatef(cpX, 0.0, cpZ);
-        glutSolidSphere(2.7/numBaseEdges, 20, 20);
+        glTranslatef(base.verts.at(i).x, 0.0, base.verts.at(i).z);
+        glutSolidSphere(0.5/numBaseEdges, 20, 20);
         glPopMatrix();
     }
-    glScalef(scaleFactors.x, 1.0, scaleFactors.z);
+    //glScalef(scaleFactors.x, 1.0, scaleFactors.z);
     glTranslatef(0.0, position.y, 0.0);
-    //std::cout << baseBottom.verts.at(0).x << ", ";
-    //std::cout << baseBottom.verts.at(0).y << "\n";
-    baseBottom.draw();
+    base.draw();
     glPopMatrix();
 }
 
@@ -250,22 +246,19 @@ void Building::checkBaseControlPoint(float wvX, float wvY)
 {
     for(int i = 0; i < baseBottom.verts.size(); i++)
     {
-        float cpXscaled = baseBottom.verts.at(i).x * scaleFactors.x;
-        float cpZscaled = baseBottom.verts.at(i).z * scaleFactors.z;
+        float cpXscaled = baseBottom.verts.at(i).x * scaleFactors.x / verticalSpline(0);
+        float cpZscaled = baseBottom.verts.at(i).z * scaleFactors.z / verticalSpline(0);
         
-        float cpX = cpXscaled*cos(rotationY) - cpZscaled*sin(rotationY);
-        float cpZ = cpXscaled*sin(rotationY) + cpZscaled*cos(rotationY);
+        float cpX = cpXscaled;//*sin(rotationY) + cpXscaled*cos(rotationY);
+        float cpZ = cpZscaled;//*cos(rotationY) - cpXscaled*sin(rotationY);
         cpZ = -cpZ;
         
-        float cpRadius = 2.7/numBaseEdges;
+        
+        float cpRadius = 0.5/numBaseEdges;
         if(abs(cpX - wvX) < cpRadius && abs(cpZ - wvY) < cpRadius){
             //This is the selected control point
             selectBaseControlPoint(i);
-            //std::cout << "SELECTED " << i << "\n";
-            //break;
         }
-        std::cout << wvX << ", " << wvY << " <<<\n";
-        std::cout << cpX << ", " << cpZ << " ****\n";
     }
 }
 
@@ -302,3 +295,125 @@ void Building::changeBaseControlPoint(int cpIndex, float newScale)
         build();
     }
 }
+
+void Building::changeScaleFactors(Vector3D scaleDeltas)
+{
+    scaleFactors.x += scaleDeltas.x;
+    scaleFactors.y += scaleDeltas.y;
+    scaleFactors.z += scaleDeltas.z;
+    
+    if(scaleFactors.x < minScaleFactor)
+    {
+        scaleFactors.x = minScaleFactor;
+    }
+    
+    if(scaleFactors.y < minScaleFactor)
+    {
+        scaleFactors.y = minScaleFactor;
+    }
+    
+    if(scaleFactors.z < minScaleFactor)
+    {
+        scaleFactors.z = minScaleFactor;
+    }
+    
+    currentHeight = initialHeight * scaleFactors.y;
+    build();
+}
+
+
+string Building::getMetaData()
+{
+    string md = "---------\n";
+    md += to_string(numBaseEdges) + "\n";
+    md += to_string(initialHeight) + "\n";
+    md += to_string(currentHeight) + "\n";
+    md += to_string(floorHeight) + "\n";
+    md += to_string(rotationY) + "\n";
+    md += to_string(scaleFactors.x) + " " + to_string(scaleFactors.y) + " " + to_string(scaleFactors.z) + "\n";
+    md += to_string(position.x) + " " + to_string(position.y) + " " + to_string(position.z) + "\n";
+    for(int i = 0; i < cpSplineScales.size(); i++)
+    {
+        md += to_string(cpSplineScales.at(i)) + " ";
+    }
+    md += "\n";
+    for(int i = 0; i < cpBaseScales.size(); i++)
+    {
+        md += to_string(cpBaseScales.at(i)) + " ";
+    }
+    md += "\n";
+    return md;
+}
+
+void Building::processMetaData(string md)
+{
+    istringstream iss(md);
+    
+    int i = 0;
+    for (string line; getline(iss, line);)
+    {
+        stringstream s(line);
+        if(i == 0) s >> numBaseEdges;
+        else if(i == 1) s >> initialHeight;
+        else if(i == 2) s >> currentHeight;
+        else if(i == 3) s >> floorHeight;
+        else if(i == 4) s >> rotationY;
+        else if(i >= 5 && i <= 8)
+        {
+            // Vector of string to save tokens
+            vector<string> tokens;
+            // stringstream class check1
+            stringstream check1(line);
+            string intermediate;
+            // Tokenizing w.r.t. space ' '
+            while(getline(check1, intermediate, ' '))
+            {
+                tokens.push_back(intermediate);
+            }
+            
+            if(i == 5)
+            {
+                stringstream s1(tokens[0]);
+                s1 >> scaleFactors.x;
+                stringstream s2(tokens[1]);
+                s2 >> scaleFactors.y;
+                stringstream s3(tokens[2]);
+                s3 >> scaleFactors.z;
+            }
+            else if(i == 6)
+            {
+                stringstream s1(tokens[0]);
+                s1 >> position.x;
+                stringstream s2(tokens[1]);
+                s2 >> position.y;
+                stringstream s3(tokens[2]);
+                s3 >> position.z;
+            }
+            else if(i == 7)
+            {
+                cpSplineScales.clear();
+                for(int j = 0; j < tokens.size(); j++)
+                {
+                    stringstream s(tokens[j]);
+                    float scale;
+                    s >> scale;
+                    cpSplineScales.push_back(scale);
+                }
+            }
+            else if(i == 8)
+            {
+                cpBaseScales.clear();
+                for(int j = 0; j < tokens.size(); j++)
+                {
+                    stringstream s(tokens[j]);
+                    float scale;
+                    s >> scale;
+                    cpBaseScales.push_back(scale);
+                }
+            }
+        }
+        i++;
+    }
+    build();
+}
+

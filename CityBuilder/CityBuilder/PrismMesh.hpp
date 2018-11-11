@@ -10,7 +10,7 @@
 #define PrismMesh_hpp
 
 #include "Polygon.hpp"
-#include "Spline.hpp"
+#include "Spline.cpp"
 #include <vector>
 #include <iostream>
 #define PI 3.14159265
@@ -19,13 +19,14 @@ class PrismMesh
 {
     
 protected:
+    
     int numBaseEdges;
     float rotationY;
-    const float initialHeight;
+    float initialHeight;
     float currentHeight;
     Vector3D scaleFactors;
     Vector3D position;
-    const float minScaleFactor = 0.2;
+    const float minScaleFactor = 0.05;
     
 public:
     

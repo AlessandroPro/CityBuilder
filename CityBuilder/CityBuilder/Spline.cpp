@@ -1,5 +1,5 @@
 /*
- * spline.hpp
+ * spline.cpp
  *
  * simple cubic spline interpolation library without external
  * dependencies
@@ -462,3 +462,4 @@ namespace
 } // namespace
 
 #endif /* TK_SPLINE_H */
+

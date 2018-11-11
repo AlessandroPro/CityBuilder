@@ -11,7 +11,7 @@
 Polygon::Polygon():
     normal(Vector3D()),
     isFrontFacing(true),
-    verts{}{}
+    verts(){}
 
 void Polygon::calculateNormal()
 {
@@ -36,7 +36,6 @@ void Polygon::draw()
     glBegin(GL_POLYGON);
     glNormal3f(normal.x, normal.y, normal.z);
     for(int i = 0; i < verts.size(); i++){
-        //std::cout << i << "\n";
         glVertex3f(verts[i].x, verts[i].y, verts[i].z);
     }
     glEnd();

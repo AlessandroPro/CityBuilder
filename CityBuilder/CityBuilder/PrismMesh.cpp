@@ -9,9 +9,9 @@
 #include "PrismMesh.hpp"
 
 PrismMesh::PrismMesh():
-    numBaseEdges(5),
+    numBaseEdges(4),
     rotationY(0.0),
-    initialHeight(5.0),
+    initialHeight(2.0), //Initial height is 100meters/unit
     currentHeight(initialHeight),
     scaleFactors(Vector3D(1.0, 1.0, 1.0)),
     position(Vector3D(0.0, initialHeight/2, 0.0))
@@ -105,8 +105,8 @@ void PrismMesh::rotateY(float deltaY)
 
 void PrismMesh::moveAlongGround(float deltaX, float deltaZ)
 {
-    position.x += deltaX;
-    position.z += deltaZ;
+    position.x += deltaX*0.5;
+    position.z += deltaZ*0.5;
 }
 
 void PrismMesh::changeScaleFactors(Vector3D scaleDeltas)

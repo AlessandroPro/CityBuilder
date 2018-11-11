@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E80699272197D885009089FA /* Spline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E80699262197D885009089FA /* Spline.cpp */; };
 		E809BED32190C9970064DC21 /* Building.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E809BED12190C9970064DC21 /* Building.cpp */; };
+		E809BED721964F3A0064DC21 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E809BED521964F3A0064DC21 /* Camera.cpp */; };
 		E8BD4575218B54B400C0375C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E8BD4574218B54B400C0375C /* main.cpp */; };
 		E8BD457D218B54ED00C0375C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8BD457C218B54ED00C0375C /* OpenGL.framework */; };
 		E8BD457F218B550A00C0375C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8BD457E218B550A00C0375C /* GLUT.framework */; };
@@ -29,9 +31,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E809BED0218F9A6D0064DC21 /* Spline.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Spline.hpp; sourceTree = "<group>"; };
+		E80699262197D885009089FA /* Spline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Spline.cpp; sourceTree = "<group>"; };
 		E809BED12190C9970064DC21 /* Building.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Building.cpp; sourceTree = "<group>"; };
 		E809BED22190C9970064DC21 /* Building.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Building.hpp; sourceTree = "<group>"; };
+		E809BED521964F3A0064DC21 /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
+		E809BED621964F3A0064DC21 /* Camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Camera.hpp; sourceTree = "<group>"; };
 		E8BD4571218B54B400C0375C /* CityBuilder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CityBuilder; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8BD4574218B54B400C0375C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E8BD457C218B54ED00C0375C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -86,7 +90,9 @@
 				E8BD4595218BE94000C0375C /* PrismMesh.cpp */,
 				E809BED12190C9970064DC21 /* Building.cpp */,
 				E809BED22190C9970064DC21 /* Building.hpp */,
-				E809BED0218F9A6D0064DC21 /* Spline.hpp */,
+				E80699262197D885009089FA /* Spline.cpp */,
+				E809BED521964F3A0064DC21 /* Camera.cpp */,
+				E809BED621964F3A0064DC21 /* Camera.hpp */,
 			);
 			path = CityBuilder;
 			sourceTree = "<group>";
@@ -160,7 +166,9 @@
 				E8BD4575218B54B400C0375C /* main.cpp in Sources */,
 				E8BD4597218BE94000C0375C /* PrismMesh.cpp in Sources */,
 				E809BED32190C9970064DC21 /* Building.cpp in Sources */,
+				E809BED721964F3A0064DC21 /* Camera.cpp in Sources */,
 				E8BD458E218BC03E00C0375C /* Vector3D.cpp in Sources */,
+				E80699272197D885009089FA /* Spline.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
