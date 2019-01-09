@@ -106,7 +106,7 @@ Here is the full list of controls:
 
 Action | Control
 ------------ | -------------
-Toggle Between Building and Street Edit Mode | e key
+Toggle Between Building and Street Edit Modes | e key
 Generate new building/street <br> (Becomes the active building/street) |     	g key
 <br> | <br>
 Move building/street forward |		w key
