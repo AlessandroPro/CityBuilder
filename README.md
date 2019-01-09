@@ -57,7 +57,8 @@ This creates smooth, curvy looking buildings.
 
 **Edit modes:** <br>
 The user can construct either streets or buildings with this program. In Street Edit Mode, the user can generate, modify, and place new streets. In Building Edit Mode, the user can generate, modify, and place new buildings. <br>
-Press the 'e' key to toggle between the two modes.
+Press the 'e' key to toggle between the two modes. <br>
+NOTE: The "current active building/street" disappears when the mode is changed. 
 
 **Creating buildings:** <br>
 In Building Edit Mode: <br>
