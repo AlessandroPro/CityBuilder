@@ -613,44 +613,46 @@ void printControls()
 {
     string controls = "\nHere are the controls for building the city:\n\n";
     controls += "-----------------------------------------------------\n";
-    controls += "Generate new building:          g key\n";
-    controls += "(Becomes the active building)\n\n";
+    controls += "There are two Edit modes: Building Mode and Street Mode\n";
+    controls += "Toggle between Edit modes:             e key\n";
+    controls += "Generate new building/street:          g key\n";
+    controls += "(Becomes the active building/street)\n\n";
     
-    controls += "Move building forward:          w key\n";
-    controls += "Move building backward:         s key\n";
-    controls += "Move building left:             a key\n";
-    controls += "Move building right:            d key\n\n";
+    controls += "Move building/street forward:          w key\n";
+    controls += "Move building/street backward:         s key\n";
+    controls += "Move building/street left:             a key\n";
+    controls += "Move building/street right:            d key\n\n";
     
-    controls += "Increase building height:       y key\n";
-    controls += "Decrease building height:       t key\n";
-    controls += "Decrease building size in x:    left arrow key\n";
-    controls += "Increase building size in x:    right arrow key\n";
-    controls += "Increase building size in z:    up arrow key\n";
-    controls += "Decrease building size in z:    left arrow key\n\n";
+    controls += "Increase building height:              y key\n";
+    controls += "Decrease building height:              t key\n";
+    controls += "Decrease building/street size in x:    left arrow key\n";
+    controls += "Increase building/street size in x:    right arrow key\n";
+    controls += "Increase building/street size in z:    up arrow key\n";
+    controls += "Decrease building/street size in z:    left arrow key\n\n";
     
-    controls += "Rotate building cw              n key\n";
-    controls += "Rotate building ccw             m key\n";
+    controls += "Rotate building/street cw:             n key\n";
+    controls += "Rotate building/street ccw:            m key\n";
     
-    controls += "Move camera                    click and drag on world viewport\n";
+    controls += "Move camera                            click and drag on world viewport\n";
     controls += "OR\n";
-    controls += "Change camera azimuth cw       h key\n";
-    controls += "Change camera azimuth ccw      k key\n";
-    controls += "Change camera elevation up     u key\n";
-    controls += "Change camera elevation down   j key\n";
-    controls += "Zoom in                        i key\n";
-    controls += "Zoom out                       o key\n";
+    controls += "Change camera azimuth cw               h key\n";
+    controls += "Change camera azimuth ccw              k key\n";
+    controls += "Change camera elevation up             u key\n";
+    controls += "Change camera elevation down           j key\n";
+    controls += "Zoom in                                i key\n";
+    controls += "Zoom out                               o key\n";
     
     
-    controls += "Save city data                 l key\n";
-    controls += "Load city data                 v key\n\n";
+    controls += "Save city data                         l key\n";
+    controls += "Load city data                         v key\n\n";
     
-    controls += "Increase number of sides       z key\n";
-    controls += "Decrease number of sides       x key\n";
+    controls += "Increase number of building sides      z key\n";
+    controls += "Decrease number of building sides      x key\n";
     
-    controls += "Change base control points     click and drag points in base viewport\n";
-    controls += "Change spline control points   click and drag points in spline viewport\n\n";
+    controls += "Change base control points             click and drag points in base viewport\n";
+    controls += "Change spline control points           click and drag points in spline viewport\n\n";
     
-    controls += "Quit the program               q key\n";
+    controls += "Quit the program                       q key\n";
     controls += "-----------------------------------------------------\n";
     
     cout << controls;
