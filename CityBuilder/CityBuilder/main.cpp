@@ -23,6 +23,7 @@
 #include "Polygon.hpp"
 #include "PrismMesh.hpp"
 #include "Building.hpp"
+#include "Street.hpp"
 #include "Camera.hpp"
 #include <iostream>
 #include <fstream>
@@ -92,9 +93,12 @@ static GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 static GLfloat light_ambient[] = { 0.4F, 0.4F, 0.4F, 1.0F };
 
 static vector<Building*> buildings;                //array of buildings
+static vector<Street*> streets;                    //array of streets
 static Building* building = new Building();             //current building
+static Street* street = new Street();             //current street
 static PrismMesh* buildingTemplate = new PrismMesh();
 static Camera camera;                                   //Camera for the scene
+static bool buildingMode = false;
 
 
 // Prototypes for functions in this module
@@ -195,10 +199,10 @@ void display(void)
     //Draw ground quad
     glBegin(GL_QUADS);
     glNormal3f(0.0, 1.0, 0.0);
-    glVertex3f(-groundLength/2, 0.0, -groundWidth/2);
-    glVertex3f(-groundLength/2, 0.0, groundWidth/2);
-    glVertex3f(groundLength/2, 0.0, groundWidth/2);
-    glVertex3f(groundLength/2, 0.0, -groundWidth/2);
+    glVertex3f(-groundLength/2, -0.01, -groundWidth/2);
+    glVertex3f(-groundLength/2, -0.01, groundWidth/2);
+    glVertex3f(groundLength/2, -0.01, groundWidth/2);
+    glVertex3f(groundLength/2, -0.01, -groundWidth/2);
     glEnd();
 
     // Set material properties of all inactive buildings
@@ -213,13 +217,25 @@ void display(void)
         buildings.at(i)->draw();
     }
     
+    for(int i = 0; i < streets.size(); i++)
+    {
+        streets.at(i)->draw();
+    }
+    
     // Set material properties of the active building
     glMaterialfv(GL_FRONT, GL_AMBIENT, activeBld_ambient);
     glMaterialfv(GL_FRONT, GL_SPECULAR, activeBld_specular);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, activeBld_diffuse);
     glMaterialfv(GL_FRONT, GL_SHININESS, activeBld_shininess);
     
-    building->draw();
+    if(buildingMode)
+    {
+        building->draw();
+    }
+    else
+    {
+        street->draw();
+    }
 
     
     //Spline view viewport
@@ -291,42 +307,6 @@ void keyboard(unsigned char key, int x, int y)
 {
     switch (key)
     {
-        case 'n':
-            building->rotateY(-5.0);
-            break;
-        case 'm':
-            building->rotateY(5.0);
-            break;
-        case 'a':
-        {
-            Vector3D perpForward = Vector3D::crossProduct(Vector3D(0,1,0), camera.forward);
-            building->moveAlongGround(perpForward.x, perpForward.z);
-            break;
-        }
-        case 'd':
-        {
-            Vector3D perpForward = Vector3D::crossProduct(Vector3D(0,1,0), camera.forward);
-            building->moveAlongGround(-perpForward.x, -perpForward.z);
-            break;
-        }
-        case 'w':
-            building->moveAlongGround(camera.forward.x, camera.forward.z);
-            break;
-        case 's':
-            building->moveAlongGround(-camera.forward.x, -camera.forward.z);
-            break;
-        case 'z':
-            building->changeNumSides(1);
-            break;
-        case 'x':
-            building->changeNumSides(-1);
-            break;
-        case 'g':
-        {
-            buildings.push_back(building);
-            building = new Building();
-            break;
-        }
         case 'h':
         {
             camera.setAzimuthChangeRate(0.01);
@@ -378,20 +358,104 @@ void keyboard(unsigned char key, int x, int y)
             loadCity(CityMetaDataFile);
             break;
         }
-        case 't':
-        {
-            building->changeScaleFactors(Vector3D(0.0, -0.1, 0.0));
-            break;
-        }
-        case 'y':
-        {
-            building->changeScaleFactors(Vector3D(0.0, 0.1, 0.0));
-            break;
-        }
         case 'q':
         {
             exit(0);
             break;
+        }
+        case 'e':
+        {
+            buildingMode = !buildingMode;
+        }
+    }
+    
+            
+    if(buildingMode)
+    {
+        switch (key)
+        {
+            case 'n':
+                building->rotateY(-5.0);
+                break;
+            case 'm':
+                building->rotateY(5.0);
+                break;
+            case 'a':
+            {
+                Vector3D perpForward = Vector3D::crossProduct(Vector3D(0,1,0), camera.forward);
+                building->moveAlongGround(perpForward.x, perpForward.z);
+                break;
+            }
+            case 'd':
+            {
+                Vector3D perpForward = Vector3D::crossProduct(Vector3D(0,1,0), camera.forward);
+                building->moveAlongGround(-perpForward.x, -perpForward.z);
+                break;
+            }
+            case 'w':
+                building->moveAlongGround(camera.forward.x, camera.forward.z);
+                break;
+            case 's':
+                building->moveAlongGround(-camera.forward.x, -camera.forward.z);
+                break;
+            case 'z':
+                building->changeNumSides(1);
+                break;
+            case 'x':
+                building->changeNumSides(-1);
+                break;
+            case 't':
+            {
+                building->changeScaleFactors(Vector3D(0.0, -0.1, 0.0));
+                break;
+            }
+            case 'y':
+            {
+                building->changeScaleFactors(Vector3D(0.0, 0.1, 0.0));
+                break;
+            }
+            case 'g':
+            {
+                buildings.push_back(building);
+                building = new Building();
+                break;
+            }
+        }
+    }
+    else
+    {
+        switch (key)
+        {
+            case 'n':
+                street->rotateY(-5.0);
+                break;
+            case 'm':
+                street->rotateY(5.0);
+                break;
+            case 'a':
+            {
+                Vector3D perpForward = Vector3D::crossProduct(Vector3D(0,1,0), camera.forward);
+                street->moveAlongGround(perpForward.x, perpForward.z);
+                break;
+            }
+            case 'd':
+            {
+                Vector3D perpForward = Vector3D::crossProduct(Vector3D(0,1,0), camera.forward);
+                street->moveAlongGround(-perpForward.x, -perpForward.z);
+                break;
+            }
+            case 'w':
+                street->moveAlongGround(camera.forward.x, camera.forward.z);
+                break;
+            case 's':
+                street->moveAlongGround(-camera.forward.x, -camera.forward.z);
+                break;
+            case 'g':
+            {
+                streets.push_back(street);
+                street = new Street();
+                break;
+            }
         }
     }
     camera.updatePosition();
@@ -428,17 +492,29 @@ void keyboardUp(unsigned char key, int x, int y)
 // Callback, handles input from the keyboard, function and arrow keys
 void functionKeys(int key, int x, int y)
 {
-    if (key == GLUT_KEY_DOWN){
+    if (key == GLUT_KEY_DOWN && buildingMode){
         building->changeScaleFactors(Vector3D(0.0, 0.0, -0.1));
     }
-    else if (key == GLUT_KEY_UP){
+    else if (key == GLUT_KEY_UP && buildingMode){
         building->changeScaleFactors(Vector3D(0.0, 0.0, 0.1));
     }
-    else if (key == GLUT_KEY_LEFT){
+    if (key == GLUT_KEY_DOWN && !buildingMode){
+        street->changeScaleFactors(0.0, -0.1);
+    }
+    else if (key == GLUT_KEY_UP && !buildingMode){
+        street->changeScaleFactors(0.0, 0.1);
+    }
+    else if (key == GLUT_KEY_LEFT && buildingMode){
         building->changeScaleFactors(Vector3D(-0.1, 0.0, 0.0));
     }
-    else if (key == GLUT_KEY_RIGHT){
+    else if (key == GLUT_KEY_RIGHT && buildingMode){
         building->changeScaleFactors(Vector3D(0.1, 0.0, 0.0));
+    }
+    else if (key == GLUT_KEY_LEFT && !buildingMode){
+        street->changeScaleFactors(-0.1, 0.0);
+    }
+    else if (key == GLUT_KEY_RIGHT && !buildingMode){
+        street->changeScaleFactors(0.1, 0.0);
     }
     glutPostRedisplay();   // Trigger a window redisplay
 }
@@ -590,7 +666,13 @@ void saveCity()
         {
             myfile << bld->getMetaData();
         }
-        myfile << "END_LIST";
+        myfile << "END_BUILDING_LIST\n";
+        //save street meta data for all completed streets
+        for (auto& strt : streets)
+        {
+            myfile << strt->getMetaData();
+        }
+        myfile << "END_STREET_LIST";
         myfile.close();
     }
     else cout << "Unable to open file";
@@ -601,6 +683,7 @@ void loadCity(string filename)
     string line;
     string metaData;
     vector<Building*> loadedBuildings;
+    vector<Street*> loadedStreets;
     ifstream myfile (filename);
     if (myfile.is_open())
     {
@@ -616,11 +699,28 @@ void loadCity(string filename)
                 loadedBuildings.push_back(bd);
                 metaData = "";
             }
-            else if(!line.compare("END_LIST"))
+            else if(!line.compare("END_BUILDING_LIST"))
             {
                 if(loadedBuildings.size() > 0)
                 {
                     loadedBuildings.at(loadedBuildings.size() - 1)->processMetaData(metaData);
+                }
+            }
+            else if(!line.compare("+++++"))
+            {
+                if(loadedStreets.size() > 0)
+                {
+                    loadedStreets.at(loadedStreets.size() - 1)->processMetaData(metaData);
+                }
+                Street* bd = new Street();
+                loadedStreets.push_back(bd);
+                metaData = "";
+            }
+            else if(!line.compare("END_STREET_LIST"))
+            {
+                if(loadedStreets.size() > 0)
+                {
+                    loadedStreets.at(loadedStreets.size() - 1)->processMetaData(metaData);
                 }
             }
             else
@@ -628,12 +728,21 @@ void loadCity(string filename)
                 metaData += line + "\n";
             }
         }
+        
         for (auto& bld : loadedBuildings)
         {
             buildings.push_back(bld);
         }
+        for (auto& strt : loadedStreets)
+        {
+            streets.push_back(strt);
+        }
+        
         glutPostRedisplay();
         myfile.close();
     }
     else cout << "Unable to open file";
 }
+
+
+

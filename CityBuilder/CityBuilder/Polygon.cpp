@@ -36,7 +36,14 @@ void Polygon::draw()
     glBegin(GL_POLYGON);
     glNormal3f(normal.x, normal.y, normal.z);
     for(int i = 0; i < verts.size(); i++){
+        if(verts.size() == 4){
+            if(i == 0) glTexCoord2f( 0.0, 0.0);
+            else if(i == 1) glTexCoord2f( 0.0, 1.0);
+            else if(i == 2) glTexCoord2f( 1.0, 1.0);
+            else if(i == 3) glTexCoord2f( 1.0, 0.0);
+        }
         glVertex3f(verts[i].x, verts[i].y, verts[i].z);
     }
     glEnd();
 }
+

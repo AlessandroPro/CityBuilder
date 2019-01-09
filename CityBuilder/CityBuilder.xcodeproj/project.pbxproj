@@ -10,6 +10,7 @@
 		E80699272197D885009089FA /* Spline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E80699262197D885009089FA /* Spline.cpp */; };
 		E809BED32190C9970064DC21 /* Building.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E809BED12190C9970064DC21 /* Building.cpp */; };
 		E809BED721964F3A0064DC21 /* Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E809BED521964F3A0064DC21 /* Camera.cpp */; };
+		E88D5E2121B1AB6D0068214D /* Street.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E88D5E1F21B1AB6D0068214D /* Street.cpp */; };
 		E8BD4575218B54B400C0375C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E8BD4574218B54B400C0375C /* main.cpp */; };
 		E8BD457D218B54ED00C0375C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8BD457C218B54ED00C0375C /* OpenGL.framework */; };
 		E8BD457F218B550A00C0375C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8BD457E218B550A00C0375C /* GLUT.framework */; };
@@ -36,6 +37,8 @@
 		E809BED22190C9970064DC21 /* Building.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Building.hpp; sourceTree = "<group>"; };
 		E809BED521964F3A0064DC21 /* Camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Camera.cpp; sourceTree = "<group>"; };
 		E809BED621964F3A0064DC21 /* Camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Camera.hpp; sourceTree = "<group>"; };
+		E88D5E1F21B1AB6D0068214D /* Street.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Street.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		E88D5E2021B1AB6D0068214D /* Street.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Street.hpp; sourceTree = "<group>"; };
 		E8BD4571218B54B400C0375C /* CityBuilder */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CityBuilder; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8BD4574218B54B400C0375C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		E8BD457C218B54ED00C0375C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -88,6 +91,8 @@
 				E8BD4593218BCABB00C0375C /* Polygon.hpp */,
 				E8BD4596218BE94000C0375C /* PrismMesh.hpp */,
 				E8BD4595218BE94000C0375C /* PrismMesh.cpp */,
+				E88D5E1F21B1AB6D0068214D /* Street.cpp */,
+				E88D5E2021B1AB6D0068214D /* Street.hpp */,
 				E809BED12190C9970064DC21 /* Building.cpp */,
 				E809BED22190C9970064DC21 /* Building.hpp */,
 				E80699262197D885009089FA /* Spline.cpp */,
@@ -164,6 +169,7 @@
 			files = (
 				E8BD4594218BCABB00C0375C /* Polygon.cpp in Sources */,
 				E8BD4575218B54B400C0375C /* main.cpp in Sources */,
+				E88D5E2121B1AB6D0068214D /* Street.cpp in Sources */,
 				E8BD4597218BE94000C0375C /* PrismMesh.cpp in Sources */,
 				E809BED32190C9970064DC21 /* Building.cpp in Sources */,
 				E809BED721964F3A0064DC21 /* Camera.cpp in Sources */,

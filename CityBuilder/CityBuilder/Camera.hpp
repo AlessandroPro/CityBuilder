@@ -31,7 +31,7 @@ class Camera
     const float minElevation = 5;
     const float maxElevation = 85;
     const float minZoomDistance = 3;
-    const float maxZoomDistance = 20;
+    const float maxZoomDistance = 40;
     Vector3D position;
     Vector3D focus;
     Vector3D forward;
