@@ -1,7 +1,6 @@
 README
 
 Alessandro Profenna
-CPS511 - Assignment 2
 City Builder
 
 This program was developed on a Mac using Xcode in C++.
