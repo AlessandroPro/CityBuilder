@@ -1,10 +1,7 @@
-# CityBuilder
+# City Builder
 An OpenGL C++ program that allows the user to create buildings and manipulate their form using scaling and extrusions.
 
 <img width="1049" alt="cityscreenshot5" src="https://user-images.githubusercontent.com/15040875/50877259-1ab04c00-139f-11e9-9560-b868b95612af.png">
-
-Alessandro Profenna
-City Builder
 
 This program was developed on a Mac using Xcode in C++.
 There are two ways to compile and run this program on a Mac:
