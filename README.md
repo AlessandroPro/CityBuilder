@@ -1,5 +1,5 @@
 # City Builder
-An OpenGL C++ program that allows the user to create buildings and manipulate their form using scaling and extrusions.
+An OpenGL C++ program that allows the user to create buildings and streets and manipulate their form using scaling and extrusions.
 
 <img width="1049" alt="cityscreenshot5" src="https://user-images.githubusercontent.com/15040875/50877259-1ab04c00-139f-11e9-9560-b868b95612af.png">
 
@@ -32,6 +32,9 @@ PrismMesh.hpp
 Building.cpp <br>
 Building.hpp
 
+Street.cpp <br>
+Street.hpp
+
 Camera.cpp <br>
 Camera.hpp
 
@@ -47,13 +50,17 @@ _____________________________________________
 The program is split into three viewports:
 
 1) **World Viewport:** on the left, which is the view of the city <br>
-2) **Base Viewport:** on the top right, which shows the base of the currently active building, whose xz cross-sectional shape
-can be modified by pulling and dragging on the control points. They can only be dragged diagonally from the centre of the base. <br>
-3) **Spline Viewport:** on the bottom right, which shows the poly line representing the vertical side of the currently active building. <br>
+2) **Base Viewport:** on the top right, which shows the base of the currently active building, if there is one, whose xz cross-sectional shape can be modified by pulling and dragging on the control points. They can only be dragged diagonally from the centre of the base. <br>
+3) **Spline Viewport:** on the bottom right, which shows the poly line representing the vertical side of the currently active building, if there is one. <br>
 By dragging the control points left/right, the user can alter the scale of each floor, thus changing the vertical profile of the building.
 This creates smooth, curvy looking buildings.
 
+**Edit modes:** <br>
+The user can construct either streets or buildings with this program. In Street Edit Mode, the user can generate, modify, and place new streets. In Building Edit Mode, the user can generate, modify, and place new buildings. <br>
+Press the 'e' key to toggle between the two modes.
+
 **Creating buildings:** <br>
+In Building Edit Mode: <br>
 Pressing the 'g' key creates a default building. It will be the active building since it's the one the user is currently editing. <br>
 The active building has a redder/pink colour tone, while all other buildings and roads have a blue/grey colour tone. <br>
 If 'g' is pressed again, a new building is generated and the "current active building' changes to it. <br>
@@ -69,14 +76,24 @@ The 'active building' can:
 7) Have its base shape be changed using the control points in the top right viewport <br>
 8) Have its floors scaled by a spline function using the control points in the bottom right viewport <br>
 
-**Creating roads:** <br>
-Use the same functionality for creating a building, just scale it down until it's flat and scale it out until it's long
+**Creating streets:** <br>
+In Street Edit Mode: <br>
+Pressing the 'g' key creates a default street. It will be the active street since it's the one the user is currently editing. <br>
+If 'g' is pressed again, a new street is generated and the "current active street' changes to it. <br>
+
+The 'active street' can:
+
+1) Be scaled in the x direction <br>
+2) Be scaled in the z direction <br>
+4) Be rotated around the y-axis <br>
+5) Be moved forward/backward, left/right with respect to the direction the camera is facing <br>
 
 **Saving/loading:** <br>
-All buildings and roads are saved by pressing the "l" key to a text file called CityMetaData.txt <br>
-All buildings and roads can be loaded from the filename assigned to the CityMetaDataFile variable at the top main.cpp. Currently that file is called "CityMetaData.txt" and has a default city loaded. It is duplicated in ExampleCity1.txt since "CityMetaData.txt" can be overwritten.
+All buildings and streets are saved by pressing the "l" key to a text file called CityMetaData.txt <br>
+All buildings and streets can be loaded from the filename assigned to the CityMetaDataFile variable at the top main.cpp. Currently that file is called "CityMetaData.txt" and has a default city loaded. It is duplicated in ExampleCity1.txt since "CityMetaData.txt" can be overwritten.
 Loading can be done at any time, even into a new instance to a program. This will not conflict with any 
-buildings that are already generated in the scene or buildings that are generated after. 
+buildings that are already generated in the scene or buildings that are generated after. <br>
+The meta data of the models are saved in a list, so more can be appeneded.
 
 **Camera:** <br>
 The camera can be moved along the hemispheric dome of the city, and always points to the origin. It can zoom in and out. <br>
@@ -89,22 +106,23 @@ Here is the full list of controls:
 
 Action | Control
 ------------ | -------------
-Generate new building <br> (Becomes the active building) |     	g key
+Toggle Between Building and Street Edit Mode | e key
+Generate new building/street <br> (Becomes the active building/street) |     	g key
 <br> | <br>
-Move building forward |		w key
-Move building backward |		s key
-Move building left |		a key
-Move building right |		d key
+Move building/street forward |		w key
+Move building/street backward |		s key
+Move building/street left |		a key
+Move building/street right |		d key
 <br> | <br>
 Increase building height |	y key
 Decrease building height|	t key
-Decrease building size in x |	left arrow key
-Increase building size in x |	right arrow key
-Increase building size in z |	up arrow key
-Decrease building size in z |	left arrow key
+Decrease building/street size in x |	left arrow key
+Increase building/street size in x |	right arrow key
+Increase building/street size in z |	up arrow key
+Decrease building/street size in z |	left arrow key
 <br> | <br>
-Rotate building cw |		n key
-Rotate building ccw |		m key
+Rotate building/street cw |		n key
+Rotate building/street ccw |		m key
 <br> | <br>
 Move camera|			click and drag on world viewport
 OR|<br>
